@@ -33,13 +33,13 @@ const Footer = () => {
         key={weather.city}
         cityname={weather.city}
         icon={
-          weather.weather.description.includes("sun")
+          weather.weather.description.includes("clear")
             ? icons.sun
             : weather.weather.description.includes("cloudy")
             ? icons.cloudy
             : weather.weather.description.includes("fog")
             ? icons.fog
-            : weather.weather.description.includes("partly")
+            : weather.weather.description.includes("cloud")
             ? icons.partly
             : weather.weather.description.includes("rain")
             ? icons.rainy
