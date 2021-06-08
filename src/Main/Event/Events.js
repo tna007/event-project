@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Col, Row, Button, Dropdown } from "react-bootstrap";
+import { Col, Dropdown } from "react-bootstrap";
 import { Route, Switch, useRouteMatch } from "react-router";
 import axios from "axios";
 
@@ -38,6 +38,7 @@ function Events() {
     if (loader.current) observer.observe(loader.current);
   }, [handleObserver]);
 
+  // ¨¨ moved getEvents() and cancel() outside. Made cancel into a function that returns undefined when called
   let cancel = () => {};
   const getEvents = async () => {
     // let response = await fetch("http://localhost:3001/events");
@@ -59,7 +60,6 @@ function Events() {
 
   useEffect(() => {
     // setIsLoading(true);
-    // ¨¨ moved getEvents() and cancel() outside. Made cancel into a function that returns undefined when called
     getEvents();
     return () => cancel();
   }, [query, page]);
@@ -138,16 +138,13 @@ function Events() {
           <img src="/assets/images/event/e.png" alt="lady"></img>
         </div>
         <div className="events-category-all-cards">
-          <a href="#events-container" alt="click to find online events">
-            <div className="orange-card" onClick={getOnlineEvents}>
-              <p>Online events</p>
-            </div>
-          </a>
-          <a href="#events-container" alt="click to find all events">
-            <div className="orange-card" onClick={getAll}>
-              <p>All events</p>
-            </div>
-          </a>
+          <div className="orange-card" onClick={getOnlineEvents}>
+            <p>Online events</p>
+          </div>
+
+          <div className="orange-card" onClick={getAll}>
+            <p>All events</p>
+          </div>
         </div>
       </div>
 
@@ -163,56 +160,6 @@ function Events() {
       </Col>
 
       <div className="BS-search">
-        {/* <Search
-        </Col>
-        <Col className="d-flex align-items-center">
-          <Col>
-            <Button variant="warning" size="lg">
-              something
-            </Button>
-          </Col>
-          <Col>
-            <Button variant="warning" size="lg">
-              something
-            </Button>
-          </Col>
-          <Col>
-            <Button variant="warning" size="lg">
-              something
-            </Button>
-          </Col>
-        </Col>
-      </Row>
-      <Switch>
-        <Route path={url} exact>
-          <Row className="mb-5 eventBanner">
-            <Col className="d-flex justify-content-center">
-              <img src="/assets/images/event/e.png" alt="lady"></img>
-            </Col>
-            <Col className="d-flex align-items-center">
-              <Col>
-                <Button variant="warning" size="lg" onClick={getOnlineEvents}>
-                  Online events
-                </Button>
-              </Col>
-              <Col>
-                <Button variant="warning" size="lg" onClick={getAll}>
-                  All events
-                </Button>
-              </Col>
-              <Col>
-                <Dropdown>
-                  <Dropdown.Toggle variant="warning" size="lg">
-                    Create Event
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu style={{ width: "35rem" }}>
-                    <NewEvent />
-                  </Dropdown.Menu>
-                </Dropdown>
-              </Col>
-            </Col>
-          </Row> */}
-
         <Search
           search={(e) => {
             //setQuery(e.target.value);
@@ -224,9 +171,7 @@ function Events() {
       <div className="events-container" id="events-container">
         <Switch>
           <Route path={url} exact>
-            {
-              //isLoading && <p>Loading...</p>
-            }
+            {isLoading && <p>Loading...</p>}
             <section className="events">
               {online && <EventList events={onlineSearch} />}
               {(events || all) && <EventList events={handleSearch} />}

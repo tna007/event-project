@@ -30,6 +30,7 @@
   width: 15vw;
   margin-right: 20px;
   text-align: center;
+  cursor: pointer;
 }
 
 .orange-card p {
