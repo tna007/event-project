@@ -37,12 +37,12 @@
   transform: translateY(160%);
 }
 
-.BS-dropdown {
+/* .BS-dropdown {
   display: flex;
   justify-content: flex-end;
   margin-right: 13vw;
   margin-top: -3vw;
-}
+} */
 
 /* bottom half */
 .BS-search {
@@ -69,6 +69,10 @@
   margin-top: 10% !important;
 }
 
+/* .btn-primary {
+  background-color: orange !important;
+  border: none !important;
+} */
 @media (max-width: 500px) {
   .orange-card {
     height: 40%;

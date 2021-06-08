@@ -7,7 +7,8 @@ import EventList from "./EventList";
 import EventSpa from "./EventSpa";
 import Search from "../Search";
 import NewEvent from "./NewEvent";
-import CustomEvent from "./CustomEvent";
+// import CustomEvent from "./CustomEvent";
+import "./customEventCss.css";
 
 function Events() {
   const [events, setEvents] = useState([]);
@@ -171,53 +172,43 @@ function Events() {
               <img src="/assets/images/event/e.png" alt="lady"></img>
             </Col>
             <Col>
-              <div className="d-flex flex-row align-items-center mt-5 mb-5">
-                <Col>
-                  <Button
-                    variant="warning"
-                    size="lg"
-                    className="text-light"
-                    onClick={getOnlineEvents}
-                  >
-                    Online events
-                  </Button>
+              <div className="d-flex flex-row align-items-center mb-5">
+                <Col
+                  className="orange-card text-light"
+                  style={{ height: "15rem" }}
+                  onClick={getOnlineEvents}
+                >
+                  Online events
                 </Col>
-                <Col>
-                  <Button
-                    variant="warning"
-                    size="lg"
-                    className="text-light"
-                    onClick={getOffline}
-                  >
-                    Offline events
-                  </Button>
+                <Col
+                  className="orange-card text-light"
+                  style={{ height: "15rem" }}
+                  onClick={getOffline}
+                >
+                  Offline events
                 </Col>
-                <Col>
-                  <Button
-                    variant="warning"
-                    size="lg"
-                    onClick={() => {
-                      getAll();
-                      getCustom();
-                    }}
-                  >
-                    All events
-                  </Button>
+                <Col
+                  className="orange-card text-light"
+                  style={{ height: "15rem" }}
+                  onClick={() => {
+                    getAll();
+                    getCustom();
+                  }}
+                >
+                  All events
                 </Col>
               </div>
 
-              <div className="d-flex flex-row align-items-center">
-                <Col>
-                  <Dropdown>
-                    <Dropdown.Toggle variant="warning" size="lg">
-                      Create Event
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu style={{ width: "35rem" }}>
-                      <NewEvent />
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </Col>
-              </div>
+              <Col>
+                <Dropdown>
+                  <Dropdown.Toggle className="orange-card text-light" size="lg">
+                    Create Event
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu style={{ width: "35rem" }}>
+                    <NewEvent />
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Col>
             </Col>
           </Row>
 
@@ -230,7 +221,7 @@ function Events() {
           <section className="events">
             {online && <EventList events={onlineSearch} />}
             {offline && <EventList events={offlineSearch} />}
-            {custom && <CustomEvent custom={customSearch} />}
+            {/* {custom && <CustomEvent custom={customSearch} />} */}
             {(events || all) && <EventList events={handleSearch} />}
           </section>
           <div ref={loader} />
