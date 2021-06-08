@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Col, Dropdown } from "react-bootstrap";
+import { Col, Row, Button, Dropdown } from "react-bootstrap";
 import { Route, Switch, useRouteMatch } from "react-router";
 import axios from "axios";
 
@@ -7,18 +7,20 @@ import EventList from "./EventList";
 import EventSpa from "./EventSpa";
 import Search from "../Search";
 import NewEvent from "./NewEvent";
-
-import "./customEventCss.css";
+import CustomEvent from "./CustomEvent";
 
 function Events() {
   const [events, setEvents] = useState([]);
   const [online, setOnline] = useState([]);
+  const [offline, setOffline] = useState([]);
   const [all, setAll] = useState([]);
+  const [custom, setCustom] = useState([]);
   const [query, setQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
 
-  const [searchTerm, setSearchTerm] = useState(""); //¨¨
   const [isLoading, setIsLoading] = useState(true);
+  let { url } = useRouteMatch();
   const loader = useRef();
 
   const handleObserver = useCallback((entries) => {
@@ -38,10 +40,8 @@ function Events() {
     if (loader.current) observer.observe(loader.current);
   }, [handleObserver]);
 
-  // ¨¨ moved getEvents() and cancel() outside. Made cancel into a function that returns undefined when called
-  let cancel = () => {};
+  let cancel;
   const getEvents = async () => {
-    // let response = await fetch("http://localhost:3001/events");
     try {
       let response = await axios({
         method: "GET",
@@ -53,13 +53,9 @@ function Events() {
       setIsLoading(false);
     } catch (e) {
       if (axios.isCancel(e)) return;
-
-      // if (e) return;
     }
   };
-
   useEffect(() => {
-    // setIsLoading(true);
     getEvents();
     return () => cancel();
   }, [query, page]);
@@ -67,47 +63,6 @@ function Events() {
   useEffect(() => {
     setEvents([]);
   }, [query]);
-
-  const getOnlineEvents = async () => {
-    setIsLoading(true);
-    let res = await axios.get(
-      `https://api.hel.fi/linkedevents/v1/event/?internet_ongoing&page=${page}`
-    );
-    let result = await res.data;
-    setOnline(result.data);
-    setIsLoading(false);
-  };
-  console.log("this is online", online);
-  const getAll = async () => {
-    setIsLoading(true);
-    setOnline([]);
-    let res = await axios.get(
-      `https://api.hel.fi/linkedevents/v1/event/?all_ongoing&page=${page}`
-    );
-    let result = await res.data;
-    setAll(result.data);
-    setIsLoading(false);
-  };
-  console.log("this is all ", all);
-
-  const handleSearch = events.filter((e) => {
-    if (e.name.en) {
-      return e.name.en.toLowerCase().includes(query.toLowerCase());
-    } else if (e.name.fi) {
-      return e.name.fi.toLowerCase().includes(query.toLowerCase());
-    } else {
-      return e.name.sv.toLowerCase().includes(query.toLowerCase());
-    }
-  });
-  const onlineSearch = online.filter((e) => {
-    if (e.name.en) {
-      return e.name.en.toLowerCase().includes(query.toLowerCase());
-    } else if (e.name.fi) {
-      return e.name.fi.toLowerCase().includes(query.toLowerCase());
-    } else {
-      return e.name.sv.toLowerCase().includes(query.toLowerCase());
-    }
-  });
 
   // delaying search so user has time to type
   // before searching activates ¨¨
@@ -127,63 +82,164 @@ function Events() {
       getEvents();
     }
   };
-  // ¨¨
 
-  let { url } = useRouteMatch();
+  const getOnlineEvents = async () => {
+    setIsLoading(true);
+    setEvents([]);
+    setAll([]);
+    setOffline([]);
+    let res = await axios.get(
+      `https://api.hel.fi/linkedevents/v1/event/?internet_ongoing&page=${page}`
+    );
+    let result = await res.data;
+    setOnline(result.data);
+    setIsLoading(false);
+  };
+  const getOffline = async () => {
+    setIsLoading(true);
+    setEvents([]);
+    setAll([]);
+    setOnline([]);
+    let res = await axios.get(
+      `https://api.hel.fi/linkedevents/v1/event/?local_ongoing&sort=-start_time&page=${page}`
+    );
+    let result = await res.data;
+    setOffline(result.data);
+    setIsLoading(false);
+  };
+  console.log("offline ", offline);
+
+  const getAll = async () => {
+    setOnline([]);
+    setOffline([]);
+    setIsLoading(true);
+    let res = await axios.get(
+      `https://api.hel.fi/linkedevents/v1/event/?all_ongoing&sort=-end_time&page=${page}`
+    );
+    let result = res.data;
+    setAll(result);
+    setIsLoading(false);
+  };
+
+  const getCustom = async () => {
+    let res = await axios.get("https://iknow-backend.herokuapp.com/newevent");
+    let result = res.data;
+    setCustom(result);
+  };
+  console.log("custom", custom);
+
+  const handleSearch = events.filter((e) => {
+    if (e.name.en) {
+      return e.name.en.toLowerCase().includes(query.toLowerCase());
+    } else if (e.name.fi) {
+      return e.name.fi.toLowerCase().includes(query.toLowerCase());
+    } else {
+      return e.name.sv.toLowerCase().includes(query.toLowerCase());
+    }
+  });
+
+  const onlineSearch = online.filter((e) => {
+    if (e.name.en) {
+      return e.name.en.toLowerCase().includes(query.toLowerCase());
+    } else if (e.name.fi) {
+      return e.name.fi.toLowerCase().includes(query.toLowerCase());
+    } else {
+      return e.name.sv.toLowerCase().includes(query.toLowerCase());
+    }
+  });
+
+  const offlineSearch = offline.filter((e) => {
+    if (e.name.en) {
+      return e.name.en.toLowerCase().includes(query.toLowerCase());
+    } else if (e.name.fi) {
+      return e.name.fi.toLowerCase().includes(query.toLowerCase());
+    } else {
+      return e.name.sv.toLowerCase().includes(query.toLowerCase());
+    }
+  });
+
+  const customSearch = custom.filter((e) => {
+    return e.name.toLowerCase().includes(query.toLowerCase());
+  });
 
   return (
     <>
-      <div className="top-graphic-and-cards-container">
-        <div className="top-graphic-and-cards-lady-img">
-          <img src="/assets/images/event/e.png" alt="lady"></img>
-        </div>
-        <div className="events-category-all-cards">
-          <div className="orange-card" onClick={getOnlineEvents}>
-            <p>Online events</p>
-          </div>
+      <Switch>
+        <Route path={url} exact>
+          <Row className="mb-5 eventBanner">
+            <Col className="d-flex justify-content-center">
+              <img src="/assets/images/event/e.png" alt="lady"></img>
+            </Col>
+            <Col>
+              <div className="d-flex flex-row align-items-center mt-5 mb-5">
+                <Col>
+                  <Button
+                    variant="warning"
+                    size="lg"
+                    className="text-light"
+                    onClick={getOnlineEvents}
+                  >
+                    Online events
+                  </Button>
+                </Col>
+                <Col>
+                  <Button
+                    variant="warning"
+                    size="lg"
+                    className="text-light"
+                    onClick={getOffline}
+                  >
+                    Offline events
+                  </Button>
+                </Col>
+                <Col>
+                  <Button
+                    variant="warning"
+                    size="lg"
+                    onClick={() => {
+                      getAll();
+                      getCustom();
+                    }}
+                  >
+                    All events
+                  </Button>
+                </Col>
+              </div>
 
-          <div className="orange-card" onClick={getAll}>
-            <p>All events</p>
-          </div>
-        </div>
-      </div>
+              <div className="d-flex flex-row align-items-center">
+                <Col>
+                  <Dropdown>
+                    <Dropdown.Toggle variant="warning" size="lg">
+                      Create Event
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu style={{ width: "35rem" }}>
+                      <NewEvent />
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </Col>
+              </div>
+            </Col>
+          </Row>
 
-      <Col>
-        <Dropdown className="BS-dropdown">
-          <Dropdown.Toggle variant="warning" size="lg">
-            Create Event
-          </Dropdown.Toggle>
-          <Dropdown.Menu style={{ width: "35rem" }}>
-            <NewEvent />
-          </Dropdown.Menu>
-        </Dropdown>
-      </Col>
+          <Search
+            search={(e) => {
+              setSearchTerm(e.target.value);
+            }}
+          />
+          {isLoading && <p>Loading...</p>}
+          <section className="events">
+            {online && <EventList events={onlineSearch} />}
+            {offline && <EventList events={offlineSearch} />}
+            {custom && <CustomEvent custom={customSearch} />}
+            {(events || all) && <EventList events={handleSearch} />}
+          </section>
+          <div ref={loader} />
+        </Route>
 
-      <div className="BS-search">
-        <Search
-          search={(e) => {
-            //setQuery(e.target.value);
-            setSearchTerm(e.target.value); //¨¨
-          }}
-        />
-      </div>
-
-      <div className="events-container" id="events-container">
-        <Switch>
-          <Route path={url} exact>
-            {isLoading && <p>Loading...</p>}
-            <section className="events">
-              {online && <EventList events={onlineSearch} />}
-              {(events || all) && <EventList events={handleSearch} />}
-            </section>
-            <div ref={loader} />
-          </Route>
-
-          <Route path={`${url}/:id`}>
-            <EventSpa />
-          </Route>
-        </Switch>
-      </div>
+        <Route path={`${url}/:id`}>
+          <EventSpa />
+        </Route>
+      </Switch>
     </>
   );
 }
