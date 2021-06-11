@@ -26,7 +26,7 @@ function Events() {
   const [isLoading, setIsLoading] = useState(true);
   let { url } = useRouteMatch();
   // loader is empty
-  const loader = useRef(); // useRef to access DOM elements
+  const loader = useRef(); // useRef to access DOM element (an empty div at the end of the page)
 
   // useCallback to only render when target is intersecting, not on everytime render Events functional component
   const handleObserver = useCallback((entries) => {
@@ -43,7 +43,7 @@ function Events() {
       rootMargin: "20px", // root margin
       threshold: 0, // use to trigger the callback when the intersection's area changed
     };
-    const observer = new IntersectionObserver(handleObserver, option); //IntersectionObserver API to asynchronously observe changes in the intersection of a target element
+    const observer = new IntersectionObserver(handleObserver, option); //IntersectionObserver API to asynchronously observe changes in the intersection of the target element
     if (loader.current) observer.observe(loader.current); // listen changes from the target element
   }, [handleObserver]);
 
